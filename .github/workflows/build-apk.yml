@@ -16,19 +16,30 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Android SDK tools
-        run: |
-          yes | sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
-
       - name: Install Buildozer
         run: |
           python -m pip install --upgrade pip
           pip install buildozer
           pip install cython==0.29.37
+
+      - name: Install Android SDK and Build Tools
+        run: |
+          buildozer android debug 2>&1 | tee buildozer-setup.log || true
+
+          SDK="$HOME/.buildozer/android/platform/android-sdk"
+
+          echo "SDK PATH: $SDK"
+
+          SDKMANAGER=$(find "$SDK" -name sdkmanager -type f | head -1)
+
+          echo "SDKMANAGER: $SDKMANAGER"
+
+          yes | "$SDKMANAGER" --licenses || true
+
+          "$SDKMANAGER" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Build SafeHER APK
         run: |
