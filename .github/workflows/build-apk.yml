@@ -22,25 +22,8 @@ jobs:
           pip install buildozer
           pip install cython==0.29.37
 
-      - name: Install Android SDK and Build Tools
-        run: |
-          buildozer android debug 2>&1 | tee buildozer-setup.log || true
-
-          SDK="$HOME/.buildozer/android/platform/android-sdk"
-
-          echo "SDK PATH: $SDK"
-
-          SDKMANAGER=$(find "$SDK" -name sdkmanager -type f | head -1)
-
-          echo "SDKMANAGER: $SDKMANAGER"
-
-          yes | "$SDKMANAGER" --licenses || true
-
-          "$SDKMANAGER" \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
-
+            - name: Install Android SDK and Build Tools
+           uses: android-actions/setup-android@v3
       - name: Build SafeHER APK
         run: |
           buildozer android debug
