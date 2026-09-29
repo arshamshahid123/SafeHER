@@ -1,4 +1,4 @@
-
+```yaml
 name: Build SafeHER APK
 
 on:
@@ -46,54 +46,72 @@ jobs:
           python -m pip install buildozer
           python -m pip install "cython<3.2"
 
-      - name: Prepare Buildozer Android SDK
+      - name: Prepare Android SDK
         run: |
-          SDK_PATH="$HOME/.buildozer/android/platform/android-sdk"
+          SYSTEM_SDK="/usr/local/lib/android/sdk"
+          BUILDOZER_SDK="$HOME/.buildozer/android/platform/android-sdk"
 
-          mkdir -p "$SDK_PATH"
+          echo "SYSTEM_SDK=$SYSTEM_SDK"
+          echo "BUILDOZER_SDK=$BUILDOZER_SDK"
 
-          echo "ANDROID_HOME=$SDK_PATH" >> "$GITHUB_ENV"
-          echo "ANDROIDSDK=$SDK_PATH" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$SDK_PATH" >> "$GITHUB_ENV"
+          mkdir -p "$BUILDOZER_SDK"
 
-          echo "Android SDK path:"
-          echo "$SDK_PATH"
+          echo "ANDROID_HOME=$BUILDOZER_SDK" >> "$GITHUB_ENV"
+          echo "ANDROIDSDK=$BUILDOZER_SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$BUILDOZER_SDK" >> "$GITHUB_ENV"
 
-          if [ -x "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager" ]; then
-            SDKMANAGER="/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager"
-          elif [ -x "$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager" ]; then
-            SDKMANAGER="$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager"
-          else
-            echo "sdkmanager not found."
+          echo "Checking sdkmanager..."
+
+          SDKMANAGER="$SYSTEM_SDK/cmdline-tools/latest/bin/sdkmanager"
+
+          if [ ! -x "$SDKMANAGER" ]; then
+            echo "sdkmanager not found at:"
+            echo "$SDKMANAGER"
             exit 1
           fi
 
-          echo "Using sdkmanager:"
+          echo "sdkmanager found:"
           echo "$SDKMANAGER"
+
+          echo "Accepting Android SDK licenses..."
+
+          yes | "$SDKMANAGER" --licenses || true
 
           echo "Installing Android SDK packages..."
 
           "$SDKMANAGER" \
-            --sdk_root="$SDK_PATH" \
             "platform-tools" \
             "build-tools;37.0.0" \
             "platforms;android-35"
 
-          echo "Android SDK packages installed."
+          echo "Copying Android SDK to Buildozer SDK location..."
+
+          cp -a "$SYSTEM_SDK/." "$BUILDOZER_SDK/"
+
+          echo "Checking copied SDK..."
+
+          ls -la "$BUILDOZER_SDK"
+
+          echo "Checking build-tools..."
+
+          ls -la "$BUILDOZER_SDK/build-tools"
 
       - name: Verify AIDL
         run: |
           SDK_PATH="$HOME/.buildozer/android/platform/android-sdk"
 
-          echo "Checking build-tools directory..."
+          echo "Android SDK:"
+          echo "$SDK_PATH"
+
+          echo "Build tools:"
           ls -la "$SDK_PATH/build-tools"
 
-          echo "Checking AIDL..."
+          echo "AIDL:"
+          ls -lh "$SDK_PATH/build-tools/37.0.0/aidl"
 
           test -f "$SDK_PATH/build-tools/37.0.0/aidl"
 
-          echo "AIDL found successfully:"
-          ls -lh "$SDK_PATH/build-tools/37.0.0/aidl"
+          echo "AIDL found successfully."
 
       - name: Clean Buildozer cache
         run: |
@@ -120,4 +138,4 @@ jobs:
         with:
           name: SafeHER-APK
           path: bin/*.apk
-
+```
