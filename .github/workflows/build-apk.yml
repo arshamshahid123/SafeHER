@@ -22,8 +22,12 @@ jobs:
           python -m pip install buildozer
           python -m pip install "cython<3.2"
 
-      - name: Install Android SDK and Build Tools
-        uses: android-actions/setup-android@v3
+           - name: Set Android SDK
+        run: |
+          echo "ANDROIDSDK=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROIDSDK=$ANDROID_HOME"
+          ls -la "$ANDROID_HOME"
 
       - name: Build SafeHER APK
         run: |
