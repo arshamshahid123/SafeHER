@@ -29,7 +29,6 @@ jobs:
             git \
             zip \
             unzip \
-            openjdk-17-jdk \
             autoconf \
             automake \
             libtool \
@@ -57,19 +56,22 @@ jobs:
 
           java -version
           javac -version
-          git --version
           python --version
           buildozer --version
           cython --version
 
-      - name: Clean previous Buildozer cache
+      - name: Accept Android SDK licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Clean Buildozer cache
         run: |
           rm -rf .buildozer
           rm -rf bin
 
       - name: Build SafeHER APK
         run: |
-          buildozer android debug
+          buildozer -v android debug
 
       - name: Check APK
         run: |
