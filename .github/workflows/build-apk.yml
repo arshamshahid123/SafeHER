@@ -1,4 +1,4 @@
-```yaml
+
 name: Build SafeHER APK
 
 on:
@@ -138,4 +138,4 @@ jobs:
         with:
           name: SafeHER-APK
           path: bin/*.apk
-```
+
