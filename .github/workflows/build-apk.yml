@@ -1,4 +1,3 @@
-
 name: Build SafeHER APK
 
 on:
@@ -40,11 +39,12 @@ jobs:
             libffi-dev \
             libssl-dev
 
-       - name: Install Buildozer
+      - name: Install Buildozer
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install "buildozer==1.5.0"
           python -m pip install "cython<3.2"
+
       - name: Prepare Android SDK
         run: |
           SYSTEM_SDK="/usr/local/lib/android/sdk"
@@ -135,7 +135,6 @@ jobs:
         run: |
           echo "Generated APK:"
           ls -lah bin/
-
           test -n "$(find bin -name '*.apk' -print -quit)"
 
       - name: Upload APK
@@ -143,4 +142,3 @@ jobs:
         with:
           name: SafeHER-APK
           path: bin/*.apk
-
